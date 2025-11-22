@@ -1,0 +1,47 @@
+# Dependencies
+/node_modules
+
+# Next.js build output
+/.next
+/out
+
+# Production
+/build
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# System files
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Typescript
+*.tsbuildinfo
+.next/types
+
+# Optional: Ignore lockfiles (only if your team prefers)
+/package-lock.json
+/yarn.lock
+/pnpm-lock.yaml
+
+# Misc
+*.swp
+*.swo
