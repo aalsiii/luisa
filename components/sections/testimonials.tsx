@@ -11,7 +11,7 @@ export function Testimonials() {
           <h2 className="text-3xl md:text-4xl font-serif italic text-stone-800">"Stories told by others"</h2>
         </div>
       </FadeIn>
-
+//hello
       <div className="grid grid-cols-1 gap-12">
         {TESTIMONIALS.map((t, idx) => (
           <FadeIn key={idx} delay={idx * 200}>
