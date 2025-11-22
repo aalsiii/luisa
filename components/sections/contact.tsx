@@ -1,8 +1,42 @@
+"use client"
+
+import { useState } from "react"
 import { MapPin, Mail } from "lucide-react"
 import { FadeIn } from "../fade-in"
 import { CATEGORIES } from "@/lib/constants"
 
 export function Contact() {
+  const [formData, setFormData] = useState({
+    name: "",
+    date: "",
+    category: "",
+    message: "",
+  })
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const subject = encodeURIComponent(
+      `Photography Inquiry - ${formData.category || "General"}`
+    )
+    const body = encodeURIComponent(
+      `Name: ${formData.name}\nDate: ${formData.date}\nCategory: ${formData.category}\n\nMessage:\n${formData.message}`
+    )
+
+    const mailtoLink = `mailto:pezvolador.fotos@gmail.com?subject=${subject}&body=${body}`
+    window.location.href = mailtoLink
+  }
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
   return (
     <div className="min-h-screen pt-32 px-6 max-w-7xl mx-auto pb-20 grid grid-cols-1 lg:grid-cols-2 gap-16">
       <FadeIn>
@@ -38,12 +72,15 @@ export function Contact() {
       </FadeIn>
 
       <FadeIn delay={200}>
-        <form className="space-y-8 bg-stone-50 p-8 md:p-12">
+        <form onSubmit={handleSubmit} className="space-y-8 bg-stone-50 p-8 md:p-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
               <label className="text-xs uppercase tracking-widest text-stone-500">Name</label>
               <input
                 type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
                 className="w-full bg-transparent border-b border-stone-300 py-2 focus:outline-none focus:border-black transition-colors font-serif"
                 placeholder="Your name"
               />
@@ -52,6 +89,9 @@ export function Contact() {
               <label className="text-xs uppercase tracking-widest text-stone-500">Date</label>
               <input
                 type="text"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
                 className="w-full bg-transparent border-b border-stone-300 py-2 focus:outline-none focus:border-black transition-colors font-serif"
                 placeholder="Preferred date"
               />
@@ -60,7 +100,13 @@ export function Contact() {
 
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-widest text-stone-500">Category</label>
-            <select className="w-full bg-transparent border-b border-stone-300 py-2 focus:outline-none focus:border-black transition-colors font-serif text-stone-600">
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="w-full bg-transparent border-b border-stone-300 py-2 focus:outline-none focus:border-black transition-colors font-serif text-stone-600"
+            >
+              <option value="">Select a category</option>
               {CATEGORIES.filter((c) => c !== "All").map((c) => (
                 <option key={c} value={c}>
                   {c}
@@ -72,12 +118,18 @@ export function Contact() {
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-widest text-stone-500">Message</label>
             <textarea
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
               className="w-full bg-transparent border-b border-stone-300 py-2 h-32 focus:outline-none focus:border-black transition-colors font-serif resize-none"
               placeholder="Tell me about your vision..."
             ></textarea>
           </div>
 
-          <button className="w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-stone-800 transition-colors">
+          <button
+            type="submit"
+            className="w-full bg-black text-white py-4 text-xs uppercase tracking-[0.2em] hover:bg-stone-800 transition-colors"
+          >
             Send Request
           </button>
         </form>
