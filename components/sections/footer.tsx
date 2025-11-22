@@ -11,7 +11,7 @@ export function Footer({ setPage }: FooterProps) {
     <footer className="bg-stone-900 text-stone-400 py-16 px-6">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="text-center md:text-left">
-          <h3 className="text-white text-2xl font-serif tracking-tighter uppercase mb-2">Lumina.</h3>
+          <h3 className="text-white text-2xl font-serif tracking-tighter uppercase mb-2">Luisa.</h3>
           <p className="text-xs tracking-widest uppercase">Photography & Art Direction</p>
         </div>
 
