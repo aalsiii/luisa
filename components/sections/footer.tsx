@@ -34,7 +34,7 @@ export function Footer({ setPage }: FooterProps) {
       </div>
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-stone-800 text-center md:flex justify-between text-[10px] uppercase tracking-widest">
         <p>&copy;Luisa Photography. All rights reserved.</p>
-        <p>Designed with silence in mind.</p>
+        <p>Designed by aalsiii</p>
       </div>
     </footer>
   )
