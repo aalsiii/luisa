@@ -1,7 +1,7 @@
 export const PORTFOLIO_ITEMS = [
   {
     id: 1,
-    category: "Urban",
+    category: "Travel",
     src: "luisa.jpg",
     location: "Tokyo",
   },
@@ -49,7 +49,7 @@ export const PORTFOLIO_ITEMS = [
   },
   {
     id: 9,
-    category: "Urban",
+    category: "Travel",
     src: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=800&h=1200&auto=format&fit=crop",
     location: "Chicago",
   },
@@ -73,7 +73,7 @@ export const PORTFOLIO_ITEMS = [
   },
 ]
 
-export const CATEGORIES = ["All", "Family", "Couple", "Urban", "Yoga", "Solo Female", "Solo Male", "Pets", "Creative"]
+export const CATEGORIES = ["All", "Family", "Couple", "Travel", "Yoga", "Solo Female", "Solo Male", "Pets", "Creative"]
 
 export const TESTIMONIALS = [
   {
@@ -99,32 +99,32 @@ export const TESTIMONIALS = [
 export const SERVICES = [
   {
     title: "Portraiture",
-    price: "Starts at $450",
+    price: "Starts at $60",
     desc: "Single subjects, captured in their most authentic light. Studio or on-location.",
   },
   {
     title: "The Narrative",
-    price: "Starts at $1200",
+    price: "Starts at $80-$100",
     desc: "For couples and families. A storytelling session that documents connection and love.",
   },
   {
     title: "Commercial",
-    price: "Custom Quote",
+    price: "Custom Price",
     desc: "High-impact visual assets for brands, yoga studios, and urban lifestyle products.",
   },
 ]
 
 export const HERO_IMAGES = [
   {
-    src: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2670&auto=format&fit=crop",
+    src: "cover1.jpg",
     subtitle: "The Silence of Nature",
   },
   {
-    src: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=2670&auto=format&fit=crop",
+    src: "cover2.jpg",
     subtitle: "Modern Portraiture",
   },
   {
-    src: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2670&auto=format&fit=crop",
+    src: "cover3.jpg",
     subtitle: "Urban Narratives",
   },
 ]

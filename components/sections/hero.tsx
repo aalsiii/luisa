@@ -81,9 +81,9 @@ export function Hero({ setPage }: HeroProps) {
         </FadeIn>
         <FadeIn delay={400}>
           <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-serif mb-10 tracking-tight leading-none shadow-black drop-shadow-2xl">
-            Chasing
+            Capturing
             <br />
-            <span className="italic font-light text-white/90">Light & Soul</span>
+            <span className="italic font-light text-white/90">The Essence</span>
           </h1>
         </FadeIn>
         <FadeIn delay={600}>

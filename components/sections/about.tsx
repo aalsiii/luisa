@@ -8,12 +8,12 @@ export function About() {
         <FadeIn>
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1554048612-387768052bf7?q=80&w=1000&auto=format&fit=crop"
+              src="luisa.jpg"
               alt="Photographer"
-              className="w-full h-[600px] object-cover grayscale rounded-sm"
+              className="w-full h-[600px] object-cover grayscale hover:grayscale-0 transition duration-300 rounded-sm"
             />
             <div className="absolute -bottom-6 -right-6 bg-white p-6 border border-stone-100 shadow-xl hidden md:block">
-              <p className="font-serif text-4xl">10+</p>
+              <p className="font-serif text-4xl">7+</p>
               <p className="text-xs uppercase tracking-widest text-stone-500">Years Experience</p>
             </div>
           </div>
@@ -29,13 +29,19 @@ export function About() {
             </h2>
             <div className="space-y-6 text-stone-600 font-light leading-relaxed">
               <p>
-                My studio is the world. Based nowhere and everywhere, I've spent the last decade traveling through 40+
-                countries, capturing the raw essence of the human experience.
+                I’m Luisa Reyes, a Guatemalan photographer and traveler. Traveling and discovering the world is essential
+                 to who I am, and being able to fund my journeys through something I genuinely love—photography—feels
+                  like a true blessing.
               </p>
               <p>
-                From the quiet solitude of urban architecture to the chaotic joy of a family reunion, my lens seeks
-                authenticity. Whether I'm shooting a high-fashion editorial in Paris or a yoga retreat in the mountains
-                of Peru, my approach remains the same: unobtrusive, observant, and deeply artistic.
+                I focus on capturing people as they are, without forcing anything, looking for  honesty, not performance.
+                 I care deeply about human connection, and I want my sessions to feel meaningful: a moment to look at loved 
+                 ones with appreciation, to reconnect, and to remember that our greatest treasure is the people we care about.
+              </p>
+                <p>
+               My work comes from observation and playfulness. I’m drawn to real emotion, natural light, and moments that 
+               don’t need to be posed. Photography is my way of paying attention to the world, telling the stories I encounter, 
+               and finding beauty in both the mundane and the sacred. If my images feel honest, then I’ve done my job.
               </p>
             </div>
 

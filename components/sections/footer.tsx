@@ -11,7 +11,7 @@ export function Footer({ setPage }: FooterProps) {
     <footer className="bg-stone-900 text-stone-400 py-16 px-6">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="text-center md:text-left">
-          <h3 className="text-white text-2xl font-serif tracking-tighter uppercase mb-2">Luisa.</h3>
+          <h3 className="text-white text-2xl font-serif tracking-tighter uppercase mb-2">Luisa Fotografia</h3>
           <p className="text-xs tracking-widest uppercase">Photography & Art Direction</p>
         </div>
 
@@ -33,7 +33,7 @@ export function Footer({ setPage }: FooterProps) {
         </div>
       </div>
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-stone-800 text-center md:flex justify-between text-[10px] uppercase tracking-widest">
-        <p>&copy;Luisa Photography. All rights reserved.</p>
+        <p>&copy;Luisa Fotografia. All rights reserved.</p>
         <p>Designed by aalsiii</p>
       </div>
     </footer>

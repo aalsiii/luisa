@@ -6,7 +6,6 @@ import { X, ChevronRight, ChevronLeft } from "lucide-react"
 interface PortfolioItem {
   id: number
   src: string
-  title: string
   location: string
   category: string
 }
@@ -58,11 +57,9 @@ export function Lightbox({ item, onClose, onNext, onPrev }: LightboxProps) {
       <div className="max-w-6xl max-h-[85vh] p-4 flex flex-col items-center">
         <img
           src={item.src || "/placeholder.svg"}
-          alt={item.title}
           className="max-h-[75vh] w-auto object-contain shadow-2xl shadow-black mb-6"
         />
         <div className="text-center text-white space-y-2">
-          <h3 className="text-3xl font-serif italic">{item.title}</h3>
           <p className="text-xs tracking-[0.3em] uppercase text-white/60">
             {item.location} • {item.category}
           </p>

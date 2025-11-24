@@ -9,7 +9,7 @@ interface PortfolioItem {
   id: number
   category: string
   src: string
-  title: string
+  title?: string
   location: string
 }
 
@@ -81,7 +81,6 @@ export function Portfolio() {
               <div className="relative overflow-hidden">
                 <img
                   src={item.src || "/placeholder.svg"}
-                  alt={item.title}
                   className="w-full h-auto object-cover transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0 grayscale-[0.5]"
                 />
 
