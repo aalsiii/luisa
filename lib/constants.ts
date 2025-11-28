@@ -124,7 +124,7 @@ export const HERO_IMAGES = [
     subtitle: "Modern Portraiture",
   },
   {
-    src: "cover3.jpg",
+    src: "cover4.jpg",
     subtitle: "Urban Narratives",
   },
 ]

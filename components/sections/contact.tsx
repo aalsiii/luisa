@@ -47,24 +47,24 @@ export function Contact() {
             <span className="italic text-stone-400">Together.</span>
           </h2>
           <p className="text-stone-500 font-light max-w-md mb-12">
-            Currently accepting bookings for the 2024 season in Japan, Europe, and North America. Available for travel
-            worldwide.
+           Let’s create meaningful images together. Simple, honest, and true to your vision, capturing moments that
+            feel natural and beautifully real.
           </p>
 
           <div className="space-y-6 mb-12">
             <div className="flex items-start gap-4">
               <MapPin className="mt-1 text-stone-800" size={20} />
               <div>
-                <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Current Base</p>
-                <p className="font-serif text-lg">Kyoto, Japan</p>
-                <p className="text-xs text-stone-400 italic mt-1">Next: Paris (Oct), New York (Nov)</p>
+                <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">On the move</p>
+                <p className="font-serif text-lg">Photographing stories</p>
+                <p className="text-xs text-stone-400 italic mt-1">around the world.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
               <Mail className="mt-1 text-stone-800" size={20} />
               <div>
                 <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Inquiries</p>
-                <p className="font-serif text-lg">hello@lumina-studio.com</p>
+                <p className="font-serif text-lg">pezvolador.fotos@gmail.com</p>
               </div>
             </div>
           </div>
