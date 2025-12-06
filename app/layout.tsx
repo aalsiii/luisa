@@ -11,21 +11,8 @@ export const metadata: Metadata = {
   description: 'Created by aalsiii',
   generator: 'v0.app',
   icons: {
-    icon: [
-      {
-        url: '/logoB.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/logoL.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/logoB.png',
+    icon: '/favicon.jpg',
+    apple: '/favicon.jpg',
   },
 }
 
