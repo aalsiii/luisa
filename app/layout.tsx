@@ -9,7 +9,6 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: 'Luisa Fotografia',
   description: 'Created by aalsiii',
-  generator: 'v0.app',
   icons: {
     icon: '/logoB.png',
     apple: '/logoB.png',
