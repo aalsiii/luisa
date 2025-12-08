@@ -27,7 +27,7 @@ export default function App() {
       case "about":
         return <About />
       case "services":
-        return <Services />
+        return <Services setPage={setPage} />
       case "testimonials":
         return <Testimonials />
       case "contact":

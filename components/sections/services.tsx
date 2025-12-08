@@ -1,7 +1,11 @@
 import { FadeIn } from "../fade-in"
 import { SERVICES } from "@/lib/constants"
 
-export function Services() {
+interface ServicesProps {
+  setPage: (page: string) => void
+}
+
+export function Services({ setPage }: ServicesProps) {
   return (
     <div className="min-h-screen pt-32 px-6 max-w-7xl mx-auto pb-20">
       <div className="text-center mb-20">
@@ -22,7 +26,10 @@ export function Services() {
               </div>
               <div>
                 <p className="text-lg font-medium mb-6">{service.price}</p>
-                <button className="text-xs uppercase tracking-widest border-b border-black pb-1 hover:text-stone-500 hover:border-stone-500 transition-all">
+                <button
+                  onClick={() => setPage("contact")}
+                  className="text-xs uppercase tracking-widest border-b border-black pb-1 hover:text-stone-500 hover:border-stone-500 transition-all"
+                >
                   Inquire Now
                 </button>
               </div>
