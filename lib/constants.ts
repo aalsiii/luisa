@@ -56,7 +56,7 @@ export const PORTFOLIO_ITEMS = [
   {
     id: 10,
     category: "Yoga",
-    src: "https://images.unsplash.com/photo-1552196563-55cd4e45efb3?q=80&w=1000&h=1000&auto=format&fit=crop",
+    src: "yoga-1.jpg",
     location: "Rishikesh",
   },
   {

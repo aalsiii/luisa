@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { X, ChevronRight, ChevronLeft } from "lucide-react"
 
 interface PortfolioItem {
-  id: number
+  id: number | string
   src: string
   location: string
   category: string

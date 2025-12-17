@@ -1,12 +1,14 @@
+
 "use client"
 
 import { useState, useEffect } from "react"
 import { FadeIn } from "../fade-in"
 import { Lightbox } from "../lightbox"
 import { PORTFOLIO_ITEMS, CATEGORIES } from "@/lib/constants"
+import { toast } from "sonner"
 
 interface PortfolioItem {
-  id: number
+  id: number | string
   category: string
   src: string
   title?: string
@@ -15,16 +17,47 @@ interface PortfolioItem {
 
 export function Portfolio() {
   const [filter, setFilter] = useState("All")
-  const [filteredItems, setFilteredItems] = useState(PORTFOLIO_ITEMS)
+  const [items, setItems] = useState<PortfolioItem[]>(PORTFOLIO_ITEMS)
+  const [filteredItems, setFilteredItems] = useState<PortfolioItem[]>(PORTFOLIO_ITEMS)
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (filter === "All") {
-      setFilteredItems(PORTFOLIO_ITEMS)
-    } else {
-      setFilteredItems(PORTFOLIO_ITEMS.filter((item) => item.category === filter))
+    const fetchItems = async () => {
+      try {
+        const res = await fetch('/api/portfolio');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          // Map DB items to match interface
+          const dbItems: PortfolioItem[] = data.data.map((item: any) => ({
+            id: item._id,
+            category: item.category,
+            src: item.src,
+            location: item.location || "Studio Session"
+          }));
+
+          // Combine static and dynamic items
+          // Placing dynamic items first for visibility
+          setItems([...dbItems, ...PORTFOLIO_ITEMS]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dynamic portfolio items", error);
+        // Fallback to just static items if fetch fails
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [filter])
+
+    fetchItems();
+  }, []);
+
+  useEffect(() => {
+    let currentItems = items;
+    if (filter !== "All") {
+      currentItems = items.filter((item) => item.category === filter);
+    }
+    setFilteredItems(currentItems);
+  }, [filter, items]);
 
   const handleNext = () => {
     const currentIndex = filteredItems.findIndex((i) => i.id === selectedItem?.id)
@@ -56,9 +89,8 @@ export function Portfolio() {
                 <button
                   key={cat}
                   onClick={() => setFilter(cat)}
-                  className={`text-xs uppercase tracking-[0.2em] transition-all relative py-2 ${
-                    filter === cat ? "text-black font-medium" : "text-stone-400 hover:text-black"
-                  }`}
+                  className={`text-xs uppercase tracking-[0.2em] transition-all relative py-2 ${filter === cat ? "text-black font-medium" : "text-stone-400 hover:text-black"
+                    }`}
                 >
                   {cat}
                   {filter === cat && (
