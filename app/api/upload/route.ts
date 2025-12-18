@@ -8,9 +8,11 @@ cloudinary.config({
 });
 
 export async function POST(req: Request) {
+    console.log("Upload API called");
     try {
         const formData = await req.formData();
         const file = formData.get('file') as Blob | null;
+        console.log("File received:", file ? "Yes" : "No");
 
         if (!file) {
             return NextResponse.json(
@@ -22,13 +24,16 @@ export async function POST(req: Request) {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
+        console.log("Starting Cloudinary upload...");
         const uploadResponse = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
                 { folder: 'luisa_portfolio' },
                 (error, result) => {
                     if (error) {
+                        console.error("Cloudinary error:", error);
                         reject(error);
                     } else {
+                        console.log("Cloudinary success");
                         resolve(result);
                     }
                 }

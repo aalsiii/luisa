@@ -13,10 +13,13 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+    console.log("Portfolio POST called");
     await dbConnect();
     try {
         const body: IPortfolioItem = await req.json();
+        console.log("Creating item:", body);
         const item = await PortfolioItem.create(body);
+        console.log("Item created");
         return NextResponse.json({ success: true, data: item }, { status: 201 });
     } catch (error) {
         return NextResponse.json({ success: false, error: 'Failed to create item' }, { status: 400 });
