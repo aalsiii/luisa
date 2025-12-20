@@ -65,24 +65,48 @@ export default function AdminDashboard() {
         setIsUploading(true);
 
         try {
-            // 1. Upload to Cloudinary
+            // 1. Get Signature from Server
+            const timestamp = Math.round((new Date()).getTime() / 1000);
+            const paramsToSign = {
+                timestamp: timestamp,
+                folder: 'luisa_portfolio'
+            };
+
+            const signRes = await fetch('/api/sign-cloudinary-params', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paramsToSign }),
+            });
+
+            if (!signRes.ok) {
+                throw new Error('Failed to get upload signature');
+            }
+
+            const signData = await signRes.json();
+            const { signature, apiKey, cloudName } = signData;
+
+            // 2. Upload directly to Cloudinary
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('api_key', apiKey);
+            formData.append('timestamp', timestamp.toString());
+            formData.append('signature', signature);
+            formData.append('folder', 'luisa_portfolio');
 
-            const uploadRes = await fetch('/api/upload', {
+            const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
                 method: 'POST',
                 body: formData,
             });
 
             const uploadData = await uploadRes.json();
 
-            if (!uploadData.success) {
-                throw new Error(uploadData.error || 'Upload failed');
+            if (!uploadRes.ok) {
+                throw new Error(uploadData.error?.message || 'Upload failed');
             }
 
-            const imageUrl = uploadData.data.secure_url;
+            const imageUrl = uploadData.secure_url;
 
-            // 2. Save metadata to MongoDB
+            // 3. Save metadata to MongoDB
             const metadataRes = await fetch('/api/portfolio', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
