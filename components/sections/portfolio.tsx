@@ -17,8 +17,8 @@ interface PortfolioItem {
 
 export function Portfolio() {
   const [filter, setFilter] = useState("All")
-  const [items, setItems] = useState<PortfolioItem[]>(PORTFOLIO_ITEMS)
-  const [filteredItems, setFilteredItems] = useState<PortfolioItem[]>(PORTFOLIO_ITEMS)
+  const [items, setItems] = useState<PortfolioItem[]>([])
+  const [filteredItems, setFilteredItems] = useState<PortfolioItem[]>([])
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -36,9 +36,7 @@ export function Portfolio() {
             location: item.location || "Studio Session"
           }));
 
-          // Combine static and dynamic items
-          // Placing dynamic items first for visibility
-          setItems([...dbItems, ...PORTFOLIO_ITEMS]);
+          setItems(dbItems);
         }
       } catch (error) {
         console.error("Failed to fetch dynamic portfolio items", error);
