@@ -66,9 +66,8 @@ export default function AdminDashboard() {
 
         try {
             // 1. Get Signature from Server
-            const timestamp = Math.round((new Date()).getTime() / 1000);
+            // We don't generate timestamp here anymore to avoid clock skew
             const paramsToSign = {
-                timestamp: timestamp,
                 folder: 'luisa_portfolio'
             };
 
@@ -83,13 +82,13 @@ export default function AdminDashboard() {
             }
 
             const signData = await signRes.json();
-            const { signature, apiKey, cloudName } = signData;
+            const { signature, apiKey, cloudName, timestamp } = signData; // Get server timestamp
 
             // 2. Upload directly to Cloudinary
             const formData = new FormData();
             formData.append('file', file);
             formData.append('api_key', apiKey);
-            formData.append('timestamp', timestamp.toString());
+            formData.append('timestamp', timestamp.toString()); // Use server timestamp
             formData.append('signature', signature);
             formData.append('folder', 'luisa_portfolio');
 

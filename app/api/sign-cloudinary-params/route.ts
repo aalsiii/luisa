@@ -12,10 +12,20 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { paramsToSign } = body;
 
-        const signature = cloudinary.utils.api_sign_request(paramsToSign, process.env.CLOUDINARY_API_SECRET as string);
+        // Generate timestamp on server to avoid client clock skew issues
+        const timestamp = Math.round((new Date()).getTime() / 1000);
+
+        // Merge timestamp into params to sign
+        const paramsWithTimestamp = {
+            ...paramsToSign,
+            timestamp
+        };
+
+        const signature = cloudinary.utils.api_sign_request(paramsWithTimestamp, process.env.CLOUDINARY_API_SECRET as string);
 
         return NextResponse.json({
             signature,
+            timestamp, // Return timestamp so client can use it
             apiKey: process.env.CLOUDINARY_API_KEY,
             cloudName: process.env.CLOUDINARY_CLOUD_NAME
         });

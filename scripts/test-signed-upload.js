@@ -10,9 +10,8 @@ async function testSignedUpload() {
     }
 
     console.log("1. Requesting signature...");
-    const timestamp = Math.round((new Date()).getTime() / 1000);
+    // timestamp is now generated on server
     const paramsToSign = {
-        timestamp: timestamp,
         folder: 'luisa_portfolio'
     };
 
@@ -30,6 +29,7 @@ async function testSignedUpload() {
 
         const signData = await signRes.json();
         console.log("Signature received. Cloud Name:", signData.cloudName);
+        console.log("Server Timestamp:", signData.timestamp);
 
         console.log("2. Uploading to Cloudinary...");
         const fileBuffer = fs.readFileSync(filePath);
@@ -38,7 +38,7 @@ async function testSignedUpload() {
         const formData = new FormData();
         formData.append('file', blob, 'large-test.jpg');
         formData.append('api_key', signData.apiKey);
-        formData.append('timestamp', timestamp.toString());
+        formData.append('timestamp', signData.timestamp.toString()); // Use server timestamp
         formData.append('signature', signData.signature);
         formData.append('folder', 'luisa_portfolio');
 
