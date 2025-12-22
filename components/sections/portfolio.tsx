@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react"
 import { FadeIn } from "../fade-in"
 import { Lightbox } from "../lightbox"
-import { PORTFOLIO_ITEMS, CATEGORIES } from "@/lib/constants"
+import { CATEGORIES } from "@/lib/constants"
 import { toast } from "sonner"
 
 interface PortfolioItem {
