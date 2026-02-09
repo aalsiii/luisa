@@ -5,21 +5,9 @@ export const CATEGORIES = ["All", "Family", "Couple", "Solos", "Lifestyle", "Yog
 export const TESTIMONIALS = [
   {
     id: 1,
-    text: "She didn't just take photos; she captured the feeling of the wind and the silence of the moment. Absolutely timeless work.",
-    author: "Elena & Marco",
-    type: "Couple Shoot",
-  },
-  {
-    id: 2,
-    text: "I've never felt so comfortable in front of a lens. The urban series she shot for my brand redefined our entire aesthetic.",
-    author: "Jonas K.",
-    type: "Urban / Brand",
-  },
-  {
-    id: 3,
-    text: "Capturing a hyperactive husky is impossible, yet she made it look like fine art. Simply magical.",
-    author: "Sarah Jenkins",
-    type: "Pet Portrait",
+    text: "I met Luisa at Nada Yoga School, where she was translating for the Spanish yoga course. When she mentioned she was a professional photographer, it felt perfectly timed because I needed to learn photography for the school’s marketing work. Luisa patiently taught me how to use a professional camera and shared so much practical knowledge about photography. She’s an amazing teacher, very generous with her skills, and truly a great photographer. I’m really grateful for everything I learned from her.",
+    author: "Akshat",
+    type: "Nada Yoga School, Rishikesh",
   },
 ]
 
@@ -44,14 +32,14 @@ export const SERVICES = [
 export const HERO_IMAGES = [
   {
     src: "cover1.jpg",
-    subtitle: "The Silence of Nature",
+    subtitle: "Moments that matter",
   },
   {
     src: "cover2.jpg",
-    subtitle: "Modern Portraiture",
+    subtitle: "Offbeat frames",
   },
   {
     src: "cover4.jpg",
-    subtitle: "Urban Narratives",
+    subtitle: "Visual Narratives",
   },
 ]

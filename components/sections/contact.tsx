@@ -42,13 +42,12 @@ export function Contact() {
       <FadeIn>
         <div>
           <h2 className="text-5xl md:text-7xl font-serif mb-8">
-            Let's Create
+            Let’s Make It
             <br />
-            <span className="italic text-stone-400">Together.</span>
+            <span className="italic text-stone-400">Happen!!!</span>
           </h2>
           <p className="text-stone-500 font-light max-w-md mb-12">
-           Let’s create meaningful images together. Simple, honest, and true to your vision, capturing moments that
-            feel natural and beautifully real.
+            High-quality images, thoughtfully crafted. For contact.
           </p>
 
           <div className="space-y-6 mb-12">
@@ -64,7 +63,9 @@ export function Contact() {
               <Mail className="mt-1 text-stone-800" size={20} />
               <div>
                 <p className="text-xs uppercase tracking-widest text-stone-400 mb-1">Inquiries</p>
-                <p className="font-serif text-lg">pezvolador.fotos@gmail.com</p>
+                <a href="mailto:pezvolador.fotos@gmail.com" className="font-serif text-lg hover:text-stone-600 transition-colors">
+                  pezvolador.fotos@gmail.com
+                </a>
               </div>
             </div>
           </div>

@@ -82,17 +82,24 @@ export function Portfolio() {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-x-8 gap-y-3 justify-end max-w-2xl">
+            <div className="flex md:flex-wrap overflow-x-auto md:overflow-visible gap-3 md:gap-x-8 md:gap-y-3 items-center md:justify-end w-full md:max-w-2xl pb-4 md:pb-0 scrollbar-hide">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setFilter(cat)}
-                  className={`text-xs uppercase tracking-[0.2em] transition-all relative py-2 ${filter === cat ? "text-black font-medium" : "text-stone-400 hover:text-black"
-                    }`}
+                  className={`
+                    whitespace-nowrap transition-all duration-300
+                    md:text-xs md:tracking-[0.2em] md:uppercase md:py-2 md:px-0 md:border-0 md:rounded-none
+                    ${filter === cat
+                      ? "md:text-black md:font-medium bg-stone-900 text-white border-stone-900"
+                      : "md:text-stone-400 md:hover:text-black bg-transparent text-stone-500 border-stone-200 hover:border-stone-300"
+                    }
+                    text-[10px] uppercase tracking-widest px-5 py-2.5 rounded-full border md:bg-transparent
+                  `}
                 >
                   {cat}
                   {filter === cat && (
-                    <span className="absolute bottom-0 left-0 w-full h-[1px] bg-black animate-fade-in"></span>
+                    <span className="hidden md:block absolute bottom-0 left-0 w-full h-[1px] bg-black animate-fade-in"></span>
                   )}
                 </button>
               ))}
