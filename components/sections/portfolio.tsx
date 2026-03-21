@@ -78,7 +78,7 @@ export function Portfolio() {
               <h2 className="text-4xl md:text-7xl font-serif">Selected Works</h2>
               <div className="h-[1px] w-20 bg-stone-900"></div>
               <p className="text-stone-500 max-w-md font-light leading-relaxed">
-                A curated collection of moments captured around the globe. Life in motion, still.
+                A curated collection of moments captured around the globe.
               </p>
             </div>
 
