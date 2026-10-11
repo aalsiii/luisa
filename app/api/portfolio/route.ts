@@ -1,50 +1,63 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import PortfolioItem, { IPortfolioItem } from '@/models/PortfolioItem';
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
-    await dbConnect();
-    try {
-        const items = await PortfolioItem.find({}).sort({ createdAt: -1 });
-        return NextResponse.json({ success: true, data: items });
-    } catch (error) {
-        return NextResponse.json({ success: false, error: 'Failed to fetch items' }, { status: 400 });
-    }
-}
+  try {
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'luisa_portfolio/',
+      max_results: 500,
+      context: true,
+      tags: true,
+    });
 
-export async function POST(req: Request) {
-    console.log("Portfolio POST called");
-    await dbConnect();
-    try {
-        const body: IPortfolioItem = await req.json();
-        console.log("Creating item:", body);
-        const item = await PortfolioItem.create(body);
-        console.log("Item created");
-        return NextResponse.json({ success: true, data: item }, { status: 201 });
-    } catch (error) {
-        return NextResponse.json({ success: false, error: 'Failed to create item' }, { status: 400 });
-    }
+    const items = (result.resources || [])
+      .map((resource: any) => ({
+        _id: resource.public_id,
+        src: resource.secure_url,
+        category: resource.tags?.[0] || resource.context?.custom?.category || 'Family',
+        location: resource.context?.custom?.location || 'Studio Session',
+        createdAt: resource.created_at,
+        width: resource.width,
+        height: resource.height,
+      }))
+      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    return NextResponse.json({ success: true, data: items });
+  } catch (error: any) {
+    console.error('Failed to fetch from Cloudinary:', error);
+    return NextResponse.json(
+      { success: false, error: error.message || 'Failed to fetch items' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE(req: Request) {
-    await dbConnect();
-    try {
-        const { searchParams } = new URL(req.url); // Use URL API directly
-        const id = searchParams.get('id');
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
 
-        if (!id) {
-            return NextResponse.json({ success: false, error: 'Missing id' }, { status: 400 });
-        }
-
-        const deletedItem = await PortfolioItem.findByIdAndDelete(id);
-
-        if (!deletedItem) {
-            return NextResponse.json({ success: false, error: 'Item not found' }, { status: 404 });
-        }
-
-        return NextResponse.json({ success: true, data: deletedItem });
-
-    } catch (error) {
-        return NextResponse.json({ success: false, error: 'Failed to delete item' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Missing id' }, { status: 400 });
     }
+
+    const result = await cloudinary.uploader.destroy(id);
+
+    return NextResponse.json({ success: true, data: result });
+  } catch (error: any) {
+    console.error('Failed to delete from Cloudinary:', error);
+    return NextResponse.json(
+      { success: false, error: error.message || 'Failed to delete item' },
+      { status: 500 }
+    );
+  }
 }

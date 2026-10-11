@@ -1,11 +1,10 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
 import { FadeIn } from "../fade-in"
 import { Lightbox } from "../lightbox"
 import { CATEGORIES } from "@/lib/constants"
-import { toast } from "sonner"
+import { Loader2, Image as ImageIcon } from "lucide-react"
 
 interface PortfolioItem {
   id: number | string
@@ -13,6 +12,17 @@ interface PortfolioItem {
   src: string
   title?: string
   location: string
+}
+
+function getOptimizedCloudinaryUrl(url: string) {
+  if (!url || typeof url !== "string") return url
+  if (url.includes("res.cloudinary.com") && url.includes("/image/upload/")) {
+    // Avoid double injecting if already transformed
+    if (!url.includes("/image/upload/f_auto,q_auto/")) {
+      return url.replace("/image/upload/", "/image/upload/f_auto,q_auto/")
+    }
+  }
+  return url
 }
 
 export function Portfolio() {
@@ -25,14 +35,13 @@ export function Portfolio() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const res = await fetch('/api/portfolio');
+        const res = await fetch('/api/portfolio', { cache: 'no-store' });
         const data = await res.json();
         if (data.success && Array.isArray(data.data)) {
-          // Map DB items to match interface
           const dbItems: PortfolioItem[] = data.data.map((item: any) => ({
             id: item._id,
             category: item.category,
-            src: item.src,
+            src: getOptimizedCloudinaryUrl(item.src),
             location: item.location || "Studio Session"
           }));
 
@@ -40,7 +49,6 @@ export function Portfolio() {
         }
       } catch (error) {
         console.error("Failed to fetch dynamic portfolio items", error);
-        // Fallback to just static items if fetch fails
       } finally {
         setIsLoading(false);
       }
@@ -107,37 +115,60 @@ export function Portfolio() {
           </div>
         </FadeIn>
 
-        {/* Masonry Layout */}
-        <div key={filter} className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8 animate-fade-in">
-          {filteredItems.map((item) => (
-            <div
-              key={item.id}
-              className="break-inside-avoid mb-8 cursor-pointer group"
-              onClick={() => setSelectedItem(item)}
-            >
-              <div className="relative overflow-hidden">
-                <img
-                  src={item.src || "/placeholder.svg"}
-                  className="w-full h-auto object-cover transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0 grayscale-[0.5]"
-                />
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center py-32 text-stone-400 gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-stone-800" />
+            <p className="text-xs uppercase tracking-widest text-stone-500">Loading gallery...</p>
+          </div>
+        )}
 
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                    <span className="text-xs uppercase tracking-widest text-black">View Project</span>
+        {/* Empty State */}
+        {!isLoading && filteredItems.length === 0 && (
+          <div className="text-center py-28 border border-dashed border-stone-200 rounded-2xl max-w-xl mx-auto">
+            <ImageIcon className="mx-auto h-10 w-10 text-stone-300 mb-3" />
+            <p className="text-stone-600 font-serif text-lg">No photos in {filter === "All" ? "gallery" : filter} yet</p>
+            <p className="text-stone-400 text-xs mt-2 max-w-sm mx-auto">
+              Photos uploaded through the admin panel will appear here automatically.
+            </p>
+          </div>
+        )}
+
+        {/* Masonry Layout */}
+        {!isLoading && filteredItems.length > 0 && (
+          <div key={filter} className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8 animate-fade-in">
+            {filteredItems.map((item) => (
+              <div
+                key={item.id}
+                className="break-inside-avoid mb-8 cursor-pointer group"
+                onClick={() => setSelectedItem(item)}
+              >
+                <div className="relative overflow-hidden bg-stone-100">
+                  <img
+                    src={item.src || "/placeholder.svg"}
+                    alt={item.category}
+                    loading="lazy"
+                    className="w-full h-auto object-cover transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0 grayscale-[0.3]"
+                  />
+
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                      <span className="text-xs uppercase tracking-widest text-black">View Project</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="mt-4 flex justify-between items-start opacity-70 group-hover:opacity-100 transition-opacity duration-500">
-                <div>
-                  <p className="text-[10px] tracking-widest uppercase text-stone-500 mt-1">{item.category}</p>
+                <div className="mt-4 flex justify-between items-start opacity-70 group-hover:opacity-100 transition-opacity duration-500">
+                  <div>
+                    <p className="text-[10px] tracking-widest uppercase text-stone-500 mt-1">{item.category}</p>
+                  </div>
+                  <span className="text-[10px] tracking-widest uppercase text-stone-400">{item.location}</span>
                 </div>
-                <span className="text-[10px] tracking-widest uppercase text-stone-400">{item.location}</span>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {selectedItem && (
