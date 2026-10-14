@@ -61,3 +61,41 @@ export async function DELETE(req: Request) {
     );
   }
 }
+
+export async function PATCH(req: Request) {
+  try {
+    const body = await req.json();
+    const { id, category, location } = body;
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Missing photo id' }, { status: 400 });
+    }
+
+    const cleanCategory = (category || 'Family').trim();
+    const cleanLocation = (location !== undefined ? location : 'Studio Session').trim() || 'Studio Session';
+
+    // Update tags and context metadata on Cloudinary
+    const result = await cloudinary.uploader.explicit(id, {
+      type: 'upload',
+      tags: [cleanCategory],
+      context: `category=${cleanCategory}|location=${cleanLocation}`,
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        _id: id,
+        category: cleanCategory,
+        location: cleanLocation,
+        tags: result.tags,
+        context: result.context,
+      },
+    });
+  } catch (error: any) {
+    console.error('Failed to update in Cloudinary:', error);
+    return NextResponse.json(
+      { success: false, error: error.message || 'Failed to update photo' },
+      { status: 500 }
+    );
+  }
+}

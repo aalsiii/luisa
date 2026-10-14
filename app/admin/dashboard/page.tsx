@@ -9,10 +9,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { toast } from "sonner"
 import Image from "next/image"
 import { CATEGORIES } from "@/lib/constants"
-import { Trash2, Upload, Loader2, Image as ImageIcon, X, RefreshCw, CheckCircle2, ArrowLeft, ExternalLink } from "lucide-react"
+import { Trash2, Upload, Loader2, Image as ImageIcon, X, RefreshCw, CheckCircle2, ArrowLeft, ExternalLink, Pencil } from "lucide-react"
 
 interface SelectedFile {
   id: string
@@ -45,6 +53,12 @@ export default function AdminDashboard() {
   const [isLoadingItems, setIsLoadingItems] = useState(true)
   const [galleryFilter, setGalleryFilter] = useState("All")
   const [isDragging, setIsDragging] = useState(false)
+
+  // Edit existing item state
+  const [editingItem, setEditingItem] = useState<CloudinaryItem | null>(null)
+  const [editCategory, setEditCategory] = useState<string>("Family")
+  const [editLocation, setEditLocation] = useState<string>("")
+  const [isSavingEdit, setIsSavingEdit] = useState<boolean>(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -235,6 +249,51 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       toast.error("Error communicating with Cloudinary")
+    }
+  }
+
+  const handleOpenEdit = (item: CloudinaryItem) => {
+    setEditingItem(item)
+    setEditCategory(item.category || "Family")
+    setEditLocation(item.location || "")
+  }
+
+  const handleSaveEdit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (!editingItem) return
+
+    setIsSavingEdit(true)
+    const targetLocation = editLocation.trim() || "Studio Session"
+
+    try {
+      const res = await fetch("/api/portfolio", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingItem._id,
+          category: editCategory,
+          location: targetLocation,
+        }),
+      })
+
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast.success("Photo details updated successfully")
+        setPortfolioItems((prev) =>
+          prev.map((item) =>
+            item._id === editingItem._id
+              ? { ...item, category: editCategory, location: targetLocation }
+              : item
+          )
+        )
+        setEditingItem(null)
+      } else {
+        toast.error(data.error || "Failed to update photo details")
+      }
+    } catch (error) {
+      toast.error("Failed to connect to server")
+    } finally {
+      setIsSavingEdit(false)
     }
   }
 
@@ -518,9 +577,29 @@ export default function AdminDashboard() {
                         </Badge>
                       </div>
 
+                      {/* Quick Edit Button (Mobile/Direct access) */}
+                      <div className="absolute top-2 right-2 z-10 sm:hidden">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEdit(item)}
+                          className="p-1.5 rounded-md bg-stone-900/80 hover:bg-stone-900 text-white backdrop-blur-sm transition shadow-xs"
+                          title="Edit Photo"
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </button>
+                      </div>
+
                       {/* Hover Overlay Actions */}
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-3 z-20">
                         <div className="flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEdit(item)}
+                            className="p-2 rounded-lg bg-stone-900/90 text-white hover:bg-black transition shadow-xs"
+                            title="Edit Category & Location"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
                           <a
                             href={item.src}
                             target="_blank"
@@ -531,6 +610,7 @@ export default function AdminDashboard() {
                             <ExternalLink className="h-4 w-4" />
                           </a>
                           <button
+                            type="button"
                             onClick={() => handleDelete(item._id)}
                             className="p-2 rounded-lg bg-red-600/90 text-white hover:bg-red-700 transition"
                             title="Delete from Cloudinary"
@@ -540,7 +620,16 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="text-white text-xs">
-                          <p className="font-semibold truncate">{item.location}</p>
+                          <div className="flex items-center justify-between gap-1">
+                            <p className="font-semibold truncate">{item.location}</p>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEdit(item)}
+                              className="text-[11px] underline text-stone-200 hover:text-white shrink-0"
+                            >
+                              Edit
+                            </button>
+                          </div>
                           <p className="text-[10px] text-stone-300">
                             {new Date(item.createdAt).toLocaleDateString()}
                           </p>
@@ -554,6 +643,105 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Photo Dialog */}
+      <Dialog open={!!editingItem} onOpenChange={(open) => !open && !isSavingEdit && setEditingItem(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Photo Details</DialogTitle>
+            <DialogDescription>
+              Correct or update the category and location/caption for this photo.
+            </DialogDescription>
+          </DialogHeader>
+
+          {editingItem && (
+            <form onSubmit={handleSaveEdit} className="space-y-4 pt-2">
+              {/* Preview & Info */}
+              <div className="flex items-center gap-4 p-3 bg-stone-50 rounded-lg border border-stone-200">
+                <div className="relative w-16 h-16 rounded-md overflow-hidden bg-stone-200 shrink-0 border">
+                  <Image
+                    src={editingItem.src}
+                    alt="Preview"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-mono text-stone-500 truncate" title={editingItem._id}>
+                    {editingItem._id.replace("luisa_portfolio/", "")}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="outline" className="text-[10px]">
+                      Current: {editingItem.category}
+                    </Badge>
+                    <span className="text-[11px] text-stone-400">
+                      {new Date(editingItem.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category */}
+              <div className="space-y-2">
+                <Label htmlFor="edit-category">Category</Label>
+                <Select
+                  value={editCategory}
+                  onValueChange={setEditCategory}
+                  disabled={isSavingEdit}
+                >
+                  <SelectTrigger id="edit-category">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.filter((c) => c !== "All").map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Location / Caption */}
+              <div className="space-y-2">
+                <Label htmlFor="edit-location">Location / Caption</Label>
+                <Input
+                  id="edit-location"
+                  placeholder="e.g. Studio Session, Rishikesh, Sunset Beach"
+                  value={editLocation}
+                  onChange={(e) => setEditLocation(e.target.value)}
+                  disabled={isSavingEdit}
+                />
+              </div>
+
+              <DialogFooter className="pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditingItem(null)}
+                  disabled={isSavingEdit}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSavingEdit}
+                  className="bg-stone-900 hover:bg-stone-800 text-white"
+                >
+                  {isSavingEdit ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
