@@ -1,37 +1,49 @@
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
+import {
+  getPortfolioOrder,
+  savePortfolioOrder,
+  applyPortfolioOrder,
+  ensureCloudinaryConfig,
+} from '@/lib/portfolio-order';
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+ensureCloudinaryConfig();
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  ensureCloudinaryConfig();
   try {
-    const result = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: 'luisa_portfolio/',
-      max_results: 500,
-      context: true,
-      tags: true,
+    // Fetch photos and saved order concurrently
+    const [result, order] = await Promise.all([
+      cloudinary.api.resources({
+        type: 'upload',
+        prefix: 'luisa_portfolio/',
+        max_results: 500,
+        context: true,
+        tags: true,
+      }),
+      getPortfolioOrder(),
+    ]);
+
+    const rawItems = (result.resources || []).map((resource: any) => ({
+      _id: resource.public_id,
+      src: resource.secure_url,
+      category: resource.tags?.[0] || resource.context?.custom?.category || 'Family',
+      location: resource.context?.custom?.location || 'Studio Session',
+      createdAt: resource.created_at,
+      width: resource.width,
+      height: resource.height,
+    }));
+
+    // Apply custom order chosen by the admin
+    const orderedItems = applyPortfolioOrder(rawItems, order);
+
+    return NextResponse.json({
+      success: true,
+      data: orderedItems,
+      order,
     });
-
-    const items = (result.resources || [])
-      .map((resource: any) => ({
-        _id: resource.public_id,
-        src: resource.secure_url,
-        category: resource.tags?.[0] || resource.context?.custom?.category || 'Family',
-        location: resource.context?.custom?.location || 'Studio Session',
-        createdAt: resource.created_at,
-        width: resource.width,
-        height: resource.height,
-      }))
-      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-    return NextResponse.json({ success: true, data: items });
   } catch (error: any) {
     console.error('Failed to fetch from Cloudinary:', error);
     return NextResponse.json(
@@ -41,7 +53,36 @@ export async function GET() {
   }
 }
 
+export async function PUT(req: Request) {
+  try {
+    const body = await req.json();
+    const { orderedIds } = body;
+
+    if (!Array.isArray(orderedIds)) {
+      return NextResponse.json(
+        { success: false, error: 'orderedIds must be an array of photo IDs' },
+        { status: 400 }
+      );
+    }
+
+    await savePortfolioOrder(orderedIds);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Portfolio display order saved successfully',
+      order: orderedIds,
+    });
+  } catch (error: any) {
+    console.error('Failed to save portfolio order:', error);
+    return NextResponse.json(
+      { success: false, error: error.message || 'Failed to save order' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(req: Request) {
+  ensureCloudinaryConfig();
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
@@ -51,6 +92,17 @@ export async function DELETE(req: Request) {
     }
 
     const result = await cloudinary.uploader.destroy(id);
+
+    // Clean up deleted photo ID from stored order
+    try {
+      const currentOrder = await getPortfolioOrder();
+      if (currentOrder.includes(id)) {
+        const updatedOrder = currentOrder.filter((item) => item !== id);
+        await savePortfolioOrder(updatedOrder);
+      }
+    } catch (orderErr) {
+      console.warn('Could not clean order on delete:', orderErr);
+    }
 
     return NextResponse.json({ success: true, data: result });
   } catch (error: any) {
@@ -63,6 +115,7 @@ export async function DELETE(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+  ensureCloudinaryConfig();
   try {
     const body = await req.json();
     const { id, category, location } = body;

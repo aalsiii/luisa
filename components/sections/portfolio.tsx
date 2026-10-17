@@ -17,7 +17,6 @@ interface PortfolioItem {
 function getOptimizedCloudinaryUrl(url: string) {
   if (!url || typeof url !== "string") return url
   if (url.includes("res.cloudinary.com") && url.includes("/image/upload/")) {
-    // Avoid double injecting if already transformed
     if (!url.includes("/image/upload/f_auto,q_auto/")) {
       return url.replace("/image/upload/", "/image/upload/f_auto,q_auto/")
     }
@@ -33,37 +32,37 @@ export function Portfolio() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const res = await fetch('/api/portfolio', { cache: 'no-store' });
-        const data = await res.json();
-        if (data.success && Array.isArray(data.data)) {
-          const dbItems: PortfolioItem[] = data.data.map((item: any) => ({
-            id: item._id,
-            category: item.category,
-            src: getOptimizedCloudinaryUrl(item.src),
-            location: item.location || "Studio Session"
-          }));
+    fetchItems()
+  }, [])
 
-          setItems(dbItems);
-        }
-      } catch (error) {
-        console.error("Failed to fetch dynamic portfolio items", error);
-      } finally {
-        setIsLoading(false);
+  const fetchItems = async () => {
+    try {
+      const res = await fetch('/api/portfolio', { cache: 'no-store' })
+      const data = await res.json()
+      if (data.success && Array.isArray(data.data)) {
+        const dbItems: PortfolioItem[] = data.data.map((item: any) => ({
+          id: item._id,
+          category: item.category,
+          src: getOptimizedCloudinaryUrl(item.src),
+          location: item.location || "Studio Session",
+        }))
+
+        setItems(dbItems)
       }
+    } catch (error) {
+      console.error("Failed to fetch dynamic portfolio items", error)
+    } finally {
+      setIsLoading(false)
     }
-
-    fetchItems();
-  }, []);
+  }
 
   useEffect(() => {
-    let currentItems = items;
+    let currentItems = items
     if (filter !== "All") {
-      currentItems = items.filter((item) => item.category === filter);
+      currentItems = items.filter((item) => item.category === filter)
     }
-    setFilteredItems(currentItems);
-  }, [filter, items]);
+    setFilteredItems(currentItems)
+  }, [filter, items])
 
   const handleNext = () => {
     const currentIndex = filteredItems.findIndex((i) => i.id === selectedItem?.id)
@@ -134,7 +133,7 @@ export function Portfolio() {
           </div>
         )}
 
-        {/* Masonry Layout */}
+        {/* Original Editorial Masonry Layout */}
         {!isLoading && filteredItems.length > 0 && (
           <div key={filter} className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8 animate-fade-in">
             {filteredItems.map((item) => (
