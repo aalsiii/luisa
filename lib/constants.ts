@@ -1,6 +1,6 @@
 
 
-export const CATEGORIES = ["All", "Family", "Couple", "Solos", "Lifestyle", "Yoga", "Pet", "Creative"]
+export const CATEGORIES = ["All", "Family", "Couple", "Solos", "Lifestyle", "Yoga", "Pet", "Commercial"]
 
 export const TESTIMONIALS = [
   {

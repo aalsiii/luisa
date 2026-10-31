@@ -28,7 +28,7 @@ export function Navigation({ activePage, setPage, isMobileMenuOpen, setIsMobileM
             isHome ? "text-white" : "text-stone-900"
           }`}
         >
-          Luisa.
+          Luisa R
         </button>
 
         {/* Desktop Nav */}

@@ -129,7 +129,7 @@ export function Lightbox({ item, onClose, onNext, onPrev }: LightboxProps) {
           src={item.src || "/placeholder.svg"}
           alt={`${item.location} • ${item.category}`}
           draggable={false}
-          className="max-h-[75vh] w-auto object-contain shadow-2xl shadow-black mb-6 pointer-events-none select-none"
+          className="max-h-[75vh] w-auto object-contain shadow-2xl shadow-black mb-6 pointer-events-none select-none grayscale-0 transition-all duration-700 animate-fade-in"
         />
         <div className="text-center text-white space-y-2">
           <p className="text-xs tracking-[0.3em] uppercase text-white/60">

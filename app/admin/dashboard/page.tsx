@@ -20,6 +20,8 @@ import {
 import { toast } from "sonner"
 import Image from "next/image"
 import { CATEGORIES } from "@/lib/constants"
+import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
 import {
   Trash2,
   Upload,
@@ -42,7 +44,12 @@ import {
   Sparkles,
   Check,
   Hash,
-  ArrowUpDown
+  ArrowUpDown,
+  MessageSquare,
+  Plus,
+  Eye,
+  EyeOff,
+  Quote
 } from "lucide-react"
 
 interface SelectedFile {
@@ -61,6 +68,15 @@ interface CloudinaryItem {
   createdAt: string
   width?: number
   height?: number
+}
+
+interface AdminTestimonial {
+  id: string
+  author: string
+  type: string
+  text: string
+  createdAt?: string
+  approved?: boolean
 }
 
 export default function AdminDashboard() {
@@ -95,11 +111,162 @@ export default function AdminDashboard() {
   const [editLocation, setEditLocation] = useState<string>("")
   const [isSavingEdit, setIsSavingEdit] = useState<boolean>(false)
 
+  // Testimonials state
+  const [testimonials, setTestimonials] = useState<AdminTestimonial[]>([])
+  const [isLoadingTestimonials, setIsLoadingTestimonials] = useState<boolean>(false)
+  const [isAddTestimonialOpen, setIsAddTestimonialOpen] = useState(false)
+  const [newAuthor, setNewAuthor] = useState("")
+  const [newType, setNewType] = useState("")
+  const [newText, setNewText] = useState("")
+  const [isSubmittingNewTestimonial, setIsSubmittingNewTestimonial] = useState(false)
+
+  const [editingTestimonial, setEditingTestimonial] = useState<AdminTestimonial | null>(null)
+  const [editAuthor, setEditAuthor] = useState("")
+  const [editType, setEditType] = useState("")
+  const [editText, setEditText] = useState("")
+  const [editApproved, setEditApproved] = useState(true)
+  const [isSavingEditTestimonial, setIsSavingEditTestimonial] = useState(false)
+  const [deletingTestimonialId, setDeletingTestimonialId] = useState<string | null>(null)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetchItems()
+    fetchAdminTestimonials()
   }, [])
+
+  const fetchAdminTestimonials = async () => {
+    setIsLoadingTestimonials(true)
+    try {
+      const res = await fetch("/api/testimonials?all=true", { cache: "no-store" })
+      const data = await res.json()
+      if (data.success && Array.isArray(data.data)) {
+        setTestimonials(data.data)
+      }
+    } catch (error) {
+      console.error("Failed to fetch testimonials:", error)
+      toast.error("Failed to load testimonials")
+    } finally {
+      setIsLoadingTestimonials(false)
+    }
+  }
+
+  const handleAddTestimonial = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newAuthor.trim() || !newText.trim()) {
+      toast.error("Please provide both author name and testimonial text")
+      return
+    }
+    setIsSubmittingNewTestimonial(true)
+    try {
+      const res = await fetch("/api/testimonials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          author: newAuthor.trim(),
+          type: newType.trim() || "Client Experience",
+          text: newText.trim(),
+          approved: true,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success("Testimonial saved to Cloudinary!")
+        setIsAddTestimonialOpen(false)
+        setNewAuthor("")
+        setNewType("")
+        setNewText("")
+        fetchAdminTestimonials()
+      } else {
+        toast.error(data.error || "Failed to save testimonial")
+      }
+    } catch (err) {
+      toast.error("Error creating testimonial")
+    } finally {
+      setIsSubmittingNewTestimonial(false)
+    }
+  }
+
+  const handleSaveEditTestimonial = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingTestimonial) return
+    if (!editAuthor.trim() || !editText.trim()) {
+      toast.error("Please provide author name and testimonial text")
+      return
+    }
+    setIsSavingEditTestimonial(true)
+    try {
+      const res = await fetch("/api/testimonials", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingTestimonial.id,
+          author: editAuthor.trim(),
+          type: editType.trim() || "Client Experience",
+          text: editText.trim(),
+          approved: editApproved,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success("Testimonial updated in Cloudinary!")
+        setEditingTestimonial(null)
+        fetchAdminTestimonials()
+      } else {
+        toast.error(data.error || "Failed to update testimonial")
+      }
+    } catch (err) {
+      toast.error("Error updating testimonial")
+    } finally {
+      setIsSavingEditTestimonial(false)
+    }
+  }
+
+  const handleDeleteTestimonial = async (id: string) => {
+    if (!confirm("Are you sure you want to permanently delete this testimonial?")) return
+    setDeletingTestimonialId(id)
+    try {
+      const res = await fetch(`/api/testimonials?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success("Testimonial deleted from Cloudinary")
+        setTestimonials((prev) => prev.filter((t) => t.id !== id))
+      } else {
+        toast.error(data.error || "Failed to delete testimonial")
+      }
+    } catch (err) {
+      toast.error("Error deleting testimonial")
+    } finally {
+      setDeletingTestimonialId(null)
+    }
+  }
+
+  const handleToggleTestimonialVisibility = async (item: AdminTestimonial) => {
+    const newApproved = item.approved === false ? true : false
+    try {
+      const res = await fetch("/api/testimonials", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: item.id,
+          approved: newApproved,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success(newApproved ? "Testimonial is now live" : "Testimonial is now hidden")
+        setTestimonials((prev) =>
+          prev.map((t) => (t.id === item.id ? { ...t, approved: newApproved } : t))
+        )
+      } else {
+        toast.error(data.error || "Failed to update visibility")
+      }
+    } catch (err) {
+      toast.error("Error updating visibility")
+    }
+  }
 
   const fetchItems = async () => {
     setIsLoadingItems(true)
@@ -586,19 +753,23 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 max-w-xl mx-auto">
-          <TabsTrigger value="upload" className="text-sm">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 max-w-3xl mx-auto h-auto p-1 gap-1">
+          <TabsTrigger value="upload" className="text-sm py-2">
             Upload Photos {selectedFiles.length > 0 && `(${selectedFiles.length})`}
           </TabsTrigger>
-          <TabsTrigger value="manage" className="text-sm">
+          <TabsTrigger value="manage" className="text-sm py-2">
             Manage Gallery ({portfolioItems.length})
           </TabsTrigger>
-          <TabsTrigger value="reorder" className="text-sm flex items-center gap-1.5">
+          <TabsTrigger value="reorder" className="text-sm py-2 flex items-center gap-1.5">
             <ListOrdered className="h-4 w-4" />
             <span>Reorder Grid</span>
             {hasUnsavedOrderChanges && (
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" title="Unsaved changes" />
             )}
+          </TabsTrigger>
+          <TabsTrigger value="testimonials" className="text-sm py-2 flex items-center gap-1.5">
+            <MessageSquare className="h-4 w-4" />
+            <span>Testimonials ({testimonials.length})</span>
           </TabsTrigger>
         </TabsList>
 
@@ -1198,6 +1369,149 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* 4. Testimonials Tab */}
+        <TabsContent value="testimonials">
+          <Card className="border-stone-200 shadow-sm">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6">
+              <div>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  Manage Client Testimonials
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Testimonials submitted by clients on your website or added here are saved directly to Cloudinary and shown on the live website.
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={fetchAdminTestimonials}
+                  disabled={isLoadingTestimonials}
+                >
+                  <RefreshCw className={`mr-2 h-4 w-4 ${isLoadingTestimonials ? "animate-spin" : ""}`} />
+                  Refresh
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => setIsAddTestimonialOpen(true)}
+                  className="bg-stone-900 hover:bg-stone-800 text-white"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Testimonial
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isLoadingTestimonials ? (
+                <div className="py-20 flex flex-col items-center justify-center text-stone-500">
+                  <Loader2 className="h-8 w-8 animate-spin mb-4 text-stone-900" />
+                  <p className="text-sm">Loading testimonials from Cloudinary...</p>
+                </div>
+              ) : testimonials.length === 0 ? (
+                <div className="py-16 text-center border-2 border-dashed border-stone-200 rounded-lg">
+                  <Quote className="mx-auto h-12 w-12 text-stone-300 mb-3" />
+                  <p className="text-base font-medium text-stone-700">No testimonials yet</p>
+                  <p className="text-xs text-stone-400 mt-1 max-w-sm mx-auto">
+                    When visitors submit testimonials on your website, they will appear here and live on the site.
+                  </p>
+                  <Button
+                    size="sm"
+                    onClick={() => setIsAddTestimonialOpen(true)}
+                    className="mt-4 bg-stone-900 text-white"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add First Testimonial
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {testimonials.map((item) => (
+                    <div
+                      key={item.id}
+                      className="border border-stone-200 rounded-lg p-5 bg-white hover:border-stone-400 transition-colors flex flex-col justify-between shadow-xs"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          <div>
+                            <h3 className="font-serif font-bold text-base text-stone-900">{item.author}</h3>
+                            <p className="text-xs text-stone-500 font-light">{item.type || "Client Experience"}</p>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            {item.approved !== false ? (
+                              <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]">
+                                Live
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-stone-100 text-stone-600 border-stone-200 text-[10px]">
+                                Hidden
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        <p className="text-sm font-light text-stone-700 italic leading-relaxed line-clamp-4 bg-stone-50/70 p-3 rounded border border-stone-100 mb-4">
+                          &quot;{item.text}&quot;
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-3 border-t border-stone-100 text-xs text-stone-400">
+                        <span>
+                          {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "Saved in Cloudinary"}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleToggleTestimonialVisibility(item)}
+                            className="h-8 px-2 text-stone-600 hover:text-stone-900"
+                            title={item.approved !== false ? "Hide from website" : "Show on website"}
+                          >
+                            {item.approved !== false ? (
+                              <Eye className="h-4 w-4 text-emerald-600" />
+                            ) : (
+                              <EyeOff className="h-4 w-4 text-stone-400" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingTestimonial(item)
+                              setEditAuthor(item.author)
+                              setEditType(item.type)
+                              setEditText(item.text)
+                              setEditApproved(item.approved !== false)
+                            }}
+                            className="h-8 px-2 text-stone-600 hover:text-stone-900"
+                            title="Edit testimonial"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={deletingTestimonialId === item.id}
+                            onClick={() => handleDeleteTestimonial(item.id)}
+                            className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            title="Delete testimonial"
+                          >
+                            {deletingTestimonialId === item.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
 
       {/* Floating Save Bar when unsaved changes exist in Reorder tab */}
@@ -1392,6 +1706,171 @@ export default function AdminDashboard() {
                   className="bg-stone-900 hover:bg-stone-800 text-white"
                 >
                   {isSavingEdit ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Testimonial Dialog */}
+      <Dialog open={isAddTestimonialOpen} onOpenChange={setIsAddTestimonialOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Add New Testimonial</DialogTitle>
+            <DialogDescription>
+              Create a testimonial to save in Cloudinary and display on the live site.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleAddTestimonial} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-author">Author / Client Name</Label>
+              <Input
+                id="new-author"
+                placeholder="e.g. Maria Gonzalez"
+                value={newAuthor}
+                onChange={(e) => setNewAuthor(e.target.value)}
+                required
+                disabled={isSubmittingNewTestimonial}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="new-type">Context / Shoot Type</Label>
+              <Input
+                id="new-type"
+                placeholder="e.g. Wedding, Portrait Session, Commercial"
+                value={newType}
+                onChange={(e) => setNewType(e.target.value)}
+                disabled={isSubmittingNewTestimonial}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="new-text">Testimonial Words</Label>
+              <Textarea
+                id="new-text"
+                rows={4}
+                placeholder="Share the client's words and experience..."
+                value={newText}
+                onChange={(e) => setNewText(e.target.value)}
+                required
+                disabled={isSubmittingNewTestimonial}
+              />
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsAddTestimonialOpen(false)}
+                disabled={isSubmittingNewTestimonial}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmittingNewTestimonial}
+                className="bg-stone-900 hover:bg-stone-800 text-white"
+              >
+                {isSubmittingNewTestimonial ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving to Cloudinary...
+                  </>
+                ) : (
+                  "Save & Publish"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Testimonial Dialog */}
+      <Dialog
+        open={!!editingTestimonial}
+        onOpenChange={(open) => !open && setEditingTestimonial(null)}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Testimonial</DialogTitle>
+            <DialogDescription>
+              Update testimonial details and visibility. Changes save to Cloudinary.
+            </DialogDescription>
+          </DialogHeader>
+
+          {editingTestimonial && (
+            <form onSubmit={handleSaveEditTestimonial} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-author">Author / Client Name</Label>
+                <Input
+                  id="edit-author"
+                  value={editAuthor}
+                  onChange={(e) => setEditAuthor(e.target.value)}
+                  required
+                  disabled={isSavingEditTestimonial}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-type">Context / Shoot Type</Label>
+                <Input
+                  id="edit-type"
+                  value={editType}
+                  onChange={(e) => setEditType(e.target.value)}
+                  disabled={isSavingEditTestimonial}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-text">Testimonial Words</Label>
+                <Textarea
+                  id="edit-text"
+                  rows={4}
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  required
+                  disabled={isSavingEditTestimonial}
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-3 border rounded-lg bg-stone-50">
+                <div className="space-y-0.5">
+                  <Label htmlFor="edit-approved" className="text-sm font-medium">Visible on Live Site</Label>
+                  <p className="text-xs text-stone-500">Show this testimonial on the public website</p>
+                </div>
+                <Switch
+                  id="edit-approved"
+                  checked={editApproved}
+                  onCheckedChange={setEditApproved}
+                  disabled={isSavingEditTestimonial}
+                />
+              </div>
+
+              <DialogFooter className="pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditingTestimonial(null)}
+                  disabled={isSavingEditTestimonial}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSavingEditTestimonial}
+                  className="bg-stone-900 hover:bg-stone-800 text-white"
+                >
+                  {isSavingEditTestimonial ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Saving...

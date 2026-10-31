@@ -11,7 +11,7 @@ const PortfolioItemSchema: Schema = new Schema({
     category: {
         type: String,
         required: [true, 'Please provide a category for this item.'],
-        enum: ['Solos', 'Couple', 'Pet', 'Family', 'Lifestyle', 'Yoga', 'Creative', 'All'],
+        enum: ['Solos', 'Couple', 'Pet', 'Family', 'Lifestyle', 'Yoga', 'Commercial', 'Creative', 'All'],
     },
     src: {
         type: String,

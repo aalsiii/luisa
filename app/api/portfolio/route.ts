@@ -29,7 +29,9 @@ export async function GET() {
     const rawItems = (result.resources || []).map((resource: any) => ({
       _id: resource.public_id,
       src: resource.secure_url,
-      category: resource.tags?.[0] || resource.context?.custom?.category || 'Family',
+      category: (resource.tags?.[0] === 'Creative' ? 'Commercial' : resource.tags?.[0]) || 
+        (resource.context?.custom?.category === 'Creative' ? 'Commercial' : resource.context?.custom?.category) || 
+        'Family',
       location: resource.context?.custom?.location || 'Studio Session',
       createdAt: resource.created_at,
       width: resource.width,

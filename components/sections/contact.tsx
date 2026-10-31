@@ -44,7 +44,7 @@ export function Contact() {
           <h2 className="text-5xl md:text-7xl font-serif mb-8">
             Let’s Make It
             <br />
-            <span className="italic text-stone-400">Happen!!!</span>
+            <span className="italic text-stone-400">Happen</span>
           </h2>
           <p className="text-stone-500 font-light max-w-md mb-12">
             High-quality images, thoughtfully crafted. For contact.

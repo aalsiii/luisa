@@ -85,7 +85,7 @@ export function Portfolio() {
               <h2 className="text-4xl md:text-7xl font-serif">Selected Works</h2>
               <div className="h-[1px] w-20 bg-stone-900"></div>
               <p className="text-stone-500 max-w-md font-light leading-relaxed">
-                A curated collection of moments captured around the globe.
+                A curated collection of moments around the globe.
               </p>
             </div>
 
@@ -147,7 +147,7 @@ export function Portfolio() {
                     src={item.src || "/placeholder.svg"}
                     alt={item.category}
                     loading="lazy"
-                    className="w-full h-auto object-cover transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0 grayscale-[0.3]"
+                    className="w-full h-auto object-cover grayscale transition-all duration-700 group-hover:scale-105"
                   />
 
                   {/* Hover Overlay */}

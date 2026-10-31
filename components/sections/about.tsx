@@ -103,37 +103,19 @@ export function About() {
           <div className="h-full flex flex-col justify-between">
             <div className="space-y-6 text-stone-600 font-light leading-relaxed">
               <p>
-                My name is Luisa Reyes, a Guatemalan photographer and traveler.
+                I&apos;m Luisa Reyes, a Guatemalan nomadic photographer drawn to the vulnerable, the unexpected, and the moments that make us human.
               </p>
               <p>
-                I seek what is authentic in humanity: the vulnerable, the resilient, the honest moments that often go unnoticed.
+                For the past decade, I&apos;ve explored the world with curiosity and a playful eye. Photography is my way of paying attention, finding beauty in the ordinary, and connecting with people beyond the surface.
               </p>
               <p>
-                Traveling and discovering the world is essential to who I am.
+                I want my photographs to remind us to appreciate the people we love, the places we&apos;ve been, and the small moments that make life meaningful.
               </p>
               <p>
-                Being able to keep moving forward with the life I love through photography is only possible because of the people who support me and trust me, and for that, I feel deeply blessed.
+                I follow the light and the stories it reveals, always looking for new ways to see and express the world around me.
               </p>
               <p>
-                I focus on capturing people as they are, without masks or performance, seeking connection and meaning.
-              </p>
-              <p>
-                I want my sessions to feel like a moment to look at loved ones with appreciation, to reconnect, and to remember that our greatest treasure is the people we care about.
-              </p>
-              <p>
-                Based nowhere and everywhere, I work wherever light reveals something worth noticing—a story, a face with a deep gaze and an expression no words could ever capture, a color, a delicate fragment of nature.
-              </p>
-              <p>
-                I’ve spent the last decade moving through different countries and cities, observing people with curiosity and playfulness, like a child exploring the world.
-              </p>
-              <p>
-                I enjoy exploring new ways of seeing and expressing, creating unexpected compositions, and approaching photography with an offbeat perspective, always looking for the heart-centered, and keeping in mind that ego is not your amigo.
-              </p>
-              <p>
-                Photography is my way of paying attention to the world, telling the stories I encounter, and finding beauty in both the mundane and the sacred.
-              </p>
-              <p>
-                If my images feel honest, then I’ve done my job.
+                If my images feel honest, I&apos;ve done my job.
               </p>
 
               <div className="flex gap-4 pt-4">
