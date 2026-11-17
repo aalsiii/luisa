@@ -147,7 +147,7 @@ export function Portfolio() {
                     src={item.src || "/placeholder.svg"}
                     alt={item.category}
                     loading="lazy"
-                    className="w-full h-auto object-cover grayscale transition-all duration-700 group-hover:scale-105"
+                    className="w-full h-auto object-cover transition-all duration-700 group-hover:scale-105"
                   />
 
                   {/* Hover Overlay */}
